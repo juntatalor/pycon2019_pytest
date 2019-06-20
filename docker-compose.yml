@@ -1,0 +1,18 @@
+version: "2.1"
+services:
+    pg:
+        image: postgres:9.6-alpine
+        environment:
+            - POSTGRES_PASSWORD=dbpass
+            - POSTGRES_DB=db
+        ports:
+            - "15432:5432"
+    test:
+        build: .
+        volumes:
+            - ".:/usr/src/app"
+        command: python3 -m http.server 8000
+        depends_on:
+          - pg
+        environment:
+            - DATABASE_URL=postgres://postgres:dbpass@pg:5432/db

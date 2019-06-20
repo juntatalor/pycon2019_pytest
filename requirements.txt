@@ -1,0 +1,13 @@
+# application
+aiohttp==3.5.4
+asyncpg==0.18.3
+jsonschema==3.0.1
+pytest-coverage
+
+# testing
+pytest==4.6.2
+
+# migrations
+yoyo-migrations==6.1.0
+psycopg2-binary==2.8.2
+aioresponses==0.6.0

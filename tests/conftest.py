@@ -27,7 +27,7 @@ async def apply_migrations():
     Запуск процесса миграций ОС асинхронно
     """
     logging.warning('Applying migrations')
-    command = f"yoyo apply --database '{Config.DATABASE_URL}' '/migrations' -b"
+    command = f"yoyo apply --database '{Config.DATABASE_URL}' 'migrations' -b"
 
     proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
@@ -43,21 +43,25 @@ async def apply_migrations():
     raise Exception('Error during applying migrations: timeout!')
 
 
-@pytest.fixture()
-async def db():
+@pytest.fixture(scope='session', autouse=True)
+def db():
     """
     Фикстура для очистки данных в БД и накатки миграций между запусками тестов
     """
-    conn = await connect(Config.DATABASE_URL)
+    async def _prepare():
+        conn = await connect(Config.DATABASE_URL)
 
-    await conn.execute("""
-        DROP SCHEMA public CASCADE;
-        CREATE SCHEMA public;
-    """)
+        await conn.execute("""
+            DROP SCHEMA public CASCADE;
+            CREATE SCHEMA public;
+        """)
 
-    await apply_migrations()
+        await apply_migrations()
 
-    await conn.close()
+        await conn.close()
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(_prepare())
 
 
 @pytest.fixture(autouse=True)

@@ -1,6 +1,6 @@
 # application
 aiohttp==3.5.4
-asyncpg==0.18.3
+asyncpg==0.21.0
 jsonschema==3.0.1
 
 # testing
